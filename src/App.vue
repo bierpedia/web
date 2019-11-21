@@ -1,10 +1,12 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+  <div class="container-fluid">
+    <div id="app">
+      <div id="nav">
+        <router-link to="/">Home</router-link> |
+        <router-link to="/about">About</router-link>
+      </div>
+      <router-view />
     </div>
-    <router-view />
   </div>
 </template>
 
@@ -22,11 +24,20 @@
 
   a {
     font-weight: bold;
-    color: #2c3e50;
 
     &.router-link-exact-active {
-      color: #42b983;
+      color: #7f8d8c;
     }
   }
+  
+}
+a {
+  color:#CA3D00;
+  transition: color 0.1s linear 0s;
+}
+
+a:hover, a:focus, a:active {
+  outline: 0;
+  color: #7f8d8c;
 }
 </style>
