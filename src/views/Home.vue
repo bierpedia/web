@@ -1,17 +1,17 @@
 <template>
   <div class="home">
-    <beer-list2 />
+    <beer-list />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import BeerList2 from "@/components/BeerList2.vue";
+import BeerList from "@/components/BeerList.vue";
 
 export default {
   name: "home",
   components: {
-    BeerList2
+    BeerList
   }
 };
 </script>
