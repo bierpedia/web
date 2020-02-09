@@ -29,14 +29,15 @@
       color: #7f8d8c;
     }
   }
-  
 }
 a {
-  color:#CA3D00;
+  color: #ca3d00;
   transition: color 0.1s linear 0s;
 }
 
-a:hover, a:focus, a:active {
+a:hover,
+a:focus,
+a:active {
   outline: 0;
   color: #7f8d8c;
 }

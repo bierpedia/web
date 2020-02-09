@@ -1,23 +1,32 @@
 <template>
-	<router-link :to="{ name: 'beer', params: { slug: beer.slug }}" class="float-left">
-		<li>
-			<div class="headshot mx-auto">
-			<img
-				class="attachment-thumbnail"
-				alt="platzhalter"
-				srcset="/assets/platzhalter-120x253.jpg, /assets/platzhalter-120x253@2x.jpg 2x"
-			/>
-			</div>
-			<div class="ellipsis name">{{ beer.name }}</div>
-			<div class="ellipsis">
-				<span v-for="beerType of beer.beerTypes" :key="beerType.slug">{{ beerType.name }}</span>
-			</div>
-			<div class="ellipsis">
-				<span v-for="brewery of beer.breweries" :key="brewery.slug">{{ brewery.name }}</span>
-			</div>
-			
-		</li>
-	</router-link>
+  <router-link
+    :to="{ name: 'beer', params: { slug: beer.slug } }"
+    class="float-left"
+  >
+    <li>
+      <div class="headshot mx-auto">
+        <img
+          class="attachment-thumbnail"
+          alt="platzhalter"
+          srcset="
+            /assets/platzhalter-120x253.jpg,
+            /assets/platzhalter-120x253@2x.jpg 2x
+          "
+        />
+      </div>
+      <div class="ellipsis name">{{ beer.name }}</div>
+      <div class="ellipsis">
+        <span v-for="beerType of beer.beerTypes" :key="beerType.slug">{{
+          beerType.name
+        }}</span>
+      </div>
+      <div class="ellipsis">
+        <span v-for="brewery of beer.breweries" :key="brewery.slug">{{
+          brewery.name
+        }}</span>
+      </div>
+    </li>
+  </router-link>
 </template>
 
 <script lang="ts">
@@ -26,48 +35,46 @@ import axios from "axios";
 
 @Component
 export default class BeerListItem extends Vue {
-	@Prop({ required: true }) private beer!: any;
-
+  @Prop({ required: true }) private beer!: any;
 }
 </script>
 
 <style scoped lang="scss">
-
-
-a:hover, a:focus, a:active {
-	text-decoration: none;
+a:hover,
+a:focus,
+a:active {
+  text-decoration: none;
 }
 
 a {
-	width: 50%;
-	width: 100%;
+  width: 50%;
+  width: 100%;
 }
 
-@media(min-width:768px) {
-	a {
-		width: 50%;
-	}
+@media (min-width: 768px) {
+  a {
+    width: 50%;
+  }
 }
 
-@media(min-width:992px) {
-	a {
-		width: 33.3%;
-	}
+@media (min-width: 992px) {
+  a {
+    width: 33.3%;
+  }
 }
-	
 
 li {
-	margin: 10px;
-	padding: 10px;
-	background-color: #f0f0f0;
-	border: 2px #f0f0f0 solid;
-	text-align: center;
-	transition: all 0.2s;
-	-webkit-column-break-inside: avoid;
-	page-break-inside: avoid;
-	break-inside: avoid;
-	list-style: none;
-	color: #7f8d8c;
+  margin: 10px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border: 2px #f0f0f0 solid;
+  text-align: center;
+  transition: all 0.2s;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  list-style: none;
+  color: #7f8d8c;
 }
 li:hover {
   border: 2px #f0f0f0 solid;
@@ -75,18 +82,18 @@ li:hover {
 }
 
 .ellipsis {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	height: 1.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 1.5em;
 }
 li:hover .ellipsis {
-	white-space: nowrap;
-	overflow: inherit; 
+  white-space: nowrap;
+  overflow: inherit;
 }
 
 .ellipsis > span {
-	margin-right: 10px;
+  margin-right: 10px;
 }
 
 .headshot {

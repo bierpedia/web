@@ -24,7 +24,7 @@ const routes = [
     path: "/beer/:slug",
     name: "beer",
     component: Beer,
-    props: true,
+    props: true
   }
 ];
 
