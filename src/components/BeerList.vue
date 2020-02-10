@@ -1,23 +1,51 @@
 <template>
   <div>
-    <b-form-input v-model="filter" @input="onFilterChange" placeholder="Volltextsuche"></b-form-input>
-    <b-form-checkbox
-      id="orderDirection"
-      v-model="direction"
-      name="checkbox-order-direction"
-      value="ASC"
-      unchecked-value="DESC"
-      @input="onFilterChange"
-    > {{ direction }}
-    </b-form-checkbox>
-    <ul class="list">
-      <div v-if="beers">
-        <div v-for="beer in beers.edges" :key="beer.id">
-          <beer-list-item :beer="beer.node" />
+    <ApolloQuery
+      :query="require('../queries/beers.gql')"
+      :variables="{
+        offset: 0,
+        filter: '',
+        direction: 'ASC'
+      }"
+      @result="onResult"
+    >
+      <template v-slot="{ result: { loading, error, data }, query }">
+        <b-form-input
+          v-model="filter"
+          @input="onFilterChange(query)"
+          placeholder="Volltextsuche"
+        ></b-form-input>
+        <b-form-checkbox
+          id="orderDirection"
+          v-model="direction"
+          name="checkbox-order-direction"
+          value="ASC"
+          unchecked-value="DESC"
+          @input="onFilterChange(query)"
+        > {{ direction }}
+        </b-form-checkbox>
+        <!-- Loading -->
+        <div v-if="loading" class="loading apollo">Loading...</div>
+
+        <!-- Error -->
+        <div v-else-if="error" class="error apollo">An error occurred</div>
+
+        <!-- Result -->
+        <div v-else-if="data" class="result apollo">
+          <ul class="list">
+            <div v-for="beer in data.beers.edges" :key="beer.node.slug">
+              <beer-list-item :beer="beer.node" />
+            </div>
+          </ul>
+          <infinite-loading
+            :identifier="infiniteId"
+            @infinite="infiniteHandler($event, query)"
+          ></infinite-loading>
         </div>
-      </div>
-      <infinite-loading :identifier="infiniteId" @infinite="infiniteHandler"></infinite-loading>
-    </ul>
+        <!-- No result -->
+        <div v-else class="no-result apollo">No result :(</div>
+      </template>
+    </ApolloQuery>
   </div>
 </template>
 
@@ -25,60 +53,12 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import BeerListItem from "@/components/BeerListItem.vue";
 import axios from "axios";
-import gql from "graphql-tag"
+import gql from "graphql-tag";
+import { SmartQuery } from "vue-apollo/types/vue-apollo";
+import { ApolloQueryResult } from "apollo-boost";
 
 @Component({
   components: { BeerListItem },
-  apollo: {
-    beers: {
-      query: gql`
-        query beers(
-          $offset: String!
-          $filter: String!
-          $direction: Direction!
-        ) {
-          beers(
-            first: 10
-            after: $offset
-            orderBy: { field: NAME, direction: $direction }
-            filter: $filter
-          ) {
-            edges {
-              cursor
-              node {
-                id
-                name
-                slug
-                breweries {
-                  name
-                }
-                beerTypes {
-                  name
-                }
-              }
-            }
-            pageInfo {
-              hasNextPage
-              endCursor
-            }
-          }
-        }`,
-      // Initial variables
-      variables: {
-        offset: "0",
-        filter: "",
-        direction: "ASC",
-      },
-      result ({ data, loading, networkStatus }) {
-        this.offset = parseInt(data.beers.pageInfo.endCursor);
-        if(!data.beers.pageInfo.hasNextPage) {
-          this.hasNextPage = false;
-        } else {
-          this.hasNextPage = true;
-        }
-      },
-    }
-  }
 })
 export default class BeerList extends Vue {
   private offset: Number = 0;
@@ -87,12 +67,12 @@ export default class BeerList extends Vue {
   private hasNextPage = true;
   private direction: string = "ASC";
 
-  infiniteHandler($state: any) {
+  infiniteHandler($state: any, query: SmartQuery<any>) {
     if (!this.hasNextPage) {
       $state.complete();
       return;
     }
-    this.$apollo.queries.beers.fetchMore({
+    query.fetchMore({
       variables: {
         offset: this.offset.toString(),
         filter: this.filter,
@@ -118,14 +98,23 @@ export default class BeerList extends Vue {
     });
   }
 
-  async onFilterChange() {
-    await this.$apollo.queries.beers.refetch({
+  async onFilterChange(query: any) {
+    await query.refetch({
       offset: 0,
       filter: this.filter,
       direction: this.direction,
     });
     this.infiniteId++;
   }
+
+  async onResult(result: any) {
+      this.offset = parseInt(result.data.beers.pageInfo.endCursor);
+      if(!result.data.beers.pageInfo.hasNextPage) {
+        this.hasNextPage = false;
+      } else {
+        this.hasNextPage = true;
+      }
+    }
 }
 </script>
 

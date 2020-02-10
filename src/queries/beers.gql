@@ -1,0 +1,27 @@
+query beers($offset: String!, $filter: String!, $direction: Direction!) {
+  beers(
+    first: 10
+    after: $offset
+    orderBy: { field: NAME, direction: $direction }
+    filter: $filter
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        name
+        slug
+        breweries {
+          name
+        }
+        beerTypes {
+          name
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
