@@ -1,0 +1,13 @@
+overwrite: true
+schema: "http://localhost:5000"
+documents: "src/**/*.gql"
+config:
+  noNamespaces: true
+  strict: true
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - "typescript"
+  ./graphql.schema.json:
+    plugins:
+      - "introspection"

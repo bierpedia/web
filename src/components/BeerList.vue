@@ -3,8 +3,9 @@
     <ApolloQuery
       :query="require('../queries/beers.gql')"
       :variables="{
-        offset: 0,
+        offset: '',
         filter: '',
+        filter_low: '',
         direction: 'ASC'
       }"
       @result="onResult"
@@ -22,13 +23,14 @@
           value="ASC"
           unchecked-value="DESC"
           @input="onFilterChange(query)"
-        > {{ direction }}
+        >
+          {{ direction }}
         </b-form-checkbox>
         <!-- Loading -->
-        <div v-if="loading" class="loading apollo">Loading...</div>
+        <!--div v-if="loading" class="loading apollo">Loading...</div-->
 
         <!-- Error -->
-        <div v-else-if="error" class="error apollo">An error occurred</div>
+        <div v-if="error" class="error apollo">An error occurred</div>
 
         <!-- Result -->
         <div v-else-if="data" class="result apollo">
@@ -55,68 +57,97 @@ import BeerListItem from "@/components/BeerListItem.vue";
 import axios from "axios";
 import gql from "graphql-tag";
 import { SmartQuery } from "vue-apollo/types/vue-apollo";
-import { ApolloQueryResult } from "apollo-boost";
+import { ApolloQueryResult, FetchMoreQueryOptions, FetchMoreOptions, ObservableQuery } from "apollo-boost";
+import { BeerConnection, BeerEdge, Maybe, Query, SortOperationKind } from '@/generated/graphql';
+import Beer from '../views/Beer.vue';
+import { Debounce } from 'vue-debounce-decorator'
+
 
 @Component({
-  components: { BeerListItem },
+  components: { BeerListItem }
 })
 export default class BeerList extends Vue {
-  private offset: Number = 0;
-  private filter: String = "";
+  private offset: string | null = null;
+  private filter: string = '';
   private infiniteId = 0;
   private hasNextPage = true;
-  private direction: string = "ASC";
+  private direction = SortOperationKind.Asc;
 
-  infiniteHandler($state: any, query: SmartQuery<any>) {
+  infiniteHandler($state: any, query: SmartQuery<Query>) {
     if (!this.hasNextPage) {
       $state.complete();
       return;
     }
+
     query.fetchMore({
       variables: {
-        offset: this.offset.toString(),
+        offset: this.offset,
         filter: this.filter,
-        direction: this.direction,
+        filter_low: this.swapCaseFirstLetter(this.filter),
+        direction: this.direction
       },
       // Transform the previous result with new data
-      updateQuery: (previousResult, { fetchMoreResult }) => {
+      updateQuery: (previousResult: Query, { fetchMoreResult } : {fetchMoreResult?: Query}) => {
         $state.loaded();
-        
-        let edges = previousResult ? 
-          [...previousResult.beers.edges, ...fetchMoreResult.beers.edges] :
-        fetchMoreResult.beers.edges;
-      
+
+        if(!previousResult.beers || !fetchMoreResult?.beers) {
+          return; // or throw?
+        }
+
+        var edges: BeerEdge[] = [];
+        if (previousResult.beers.edges) {
+          edges.push(...previousResult.beers.edges);
+        }
+
+        if(fetchMoreResult.beers.edges) {
+          edges.push(...fetchMoreResult.beers.edges);
+        }
+
         return {
           beers: {
-            __typename: fetchMoreResult.beers.__typename,
-            // Merging the edges
+            __typename: previousResult.beers.__typename,
+            // Merging the edges)
             edges: edges,
-            pageInfo: fetchMoreResult.beers.pageInfo,
-          },
-        }
-      },
+            pageInfo: fetchMoreResult.beers.pageInfo
+          }
+        };
+      }
     });
   }
 
+  @Debounce(150)
   async onFilterChange(query: any) {
     await query.refetch({
-      offset: 0,
+      offset: "",
       filter: this.filter,
-      direction: this.direction,
+      filter_low: this.swapCaseFirstLetter(this.filter),
+      direction: this.direction
     });
     this.infiniteId++;
   }
 
   async onResult(result: any) {
-      this.offset = parseInt(result.data.beers.pageInfo.endCursor);
-      if(!result.data.beers.pageInfo.hasNextPage) {
-        this.hasNextPage = false;
-      } else {
-        this.hasNextPage = true;
-      }
+    this.offset = result.data.beers.pageInfo.endCursor;
+    if (!result.data.beers.pageInfo.hasNextPage) {
+      this.hasNextPage = false;
+    } else {
+      this.hasNextPage = true; 
     }
+  }
+
+  swapCaseFirstLetter(text: string | null) {
+    if (!text) {
+      return text;
+    }
+    if (text.length == 0) {
+      return text;
+    }
+    if (text[0] === text[0].toLowerCase()) {
+      return text[0].toUpperCase() + text.slice(1, -1);
+    }
+    return text[0].toLowerCase() + text.slice(1, -1);
+  } 
 }
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

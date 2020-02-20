@@ -5,7 +5,17 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "gen": "graphql-codegen --config codegen.yml"
+  },
+  "rules": {
+    "prettier/prettier": [
+      "warn",
+      {
+        "useTabs": "true",
+        "trailingComma": "es5"
+      }
+    ]
   },
   "dependencies": {
     "apollo-boost": "^0.4.7",
@@ -16,11 +26,18 @@
     "vue": "^2.6.10",
     "vue-apollo": "^3.0.0-beta.11",
     "vue-class-component": "^7.0.2",
+    "vue-debounce-decorator": "^1.0.1",
     "vue-infinite-loading": "^2.4.4",
     "vue-property-decorator": "^8.3.0",
     "vue-router": "^3.1.3"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.8.3",
+    "@graphql-codegen/cli": "^1.12.2",
+    "@graphql-codegen/introspection": "1.12.2",
+    "@graphql-codegen/typescript": "^1.12.2",
+    "@graphql-codegen/typescript-operations": "^1.12.2",
+    "@graphql-codegen/typescript-vue-apollo": "^1.12.2",
     "@vue/cli-plugin-babel": "^4.0.0",
     "@vue/cli-plugin-eslint": "^4.0.0",
     "@vue/cli-plugin-router": "^4.0.0",
@@ -31,11 +48,12 @@
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^5.0.0",
+    "graphql": "^14.6.0",
     "graphql-tag": "^2.9.0",
     "node-sass": "^4.12.0",
     "prettier": "^1.18.2",
     "sass-loader": "^8.0.0",
-    "typescript": "~3.5.3",
+    "typescript": "~3.7.0",
     "vue-cli-plugin-apollo": "^0.21.3",
     "vue-template-compiler": "^2.6.10"
   }

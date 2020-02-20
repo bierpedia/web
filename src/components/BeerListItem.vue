@@ -5,6 +5,9 @@
   >
     <li>
       <div class="headshot mx-auto">
+        <div class="note">
+          {{ beer.averageGrade }} <span class="nach-komma"></span>
+        </div>
         <img
           class="attachment-thumbnail"
           alt="platzhalter"

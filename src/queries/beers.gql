@@ -1,20 +1,20 @@
-query beers($offset: String!, $filter: String!, $direction: Direction!) {
+query beers($offset: String, $filter: String, $filter_low: String, $direction: SortOperationKind!) {
   beers(
     first: 10
     after: $offset
-    orderBy: { field: NAME, direction: $direction }
-    filter: $filter
+    order_by: { name: $direction }
+    where: { OR: [{name_contains: $filter}, {name_contains: $filter_low}] }
   ) {
     edges {
       cursor
       node {
-        id
         name
         slug
+        averageGrade
         breweries {
           name
         }
-        beerTypes {
+        styles {
           name
         }
       }

@@ -1,7 +1,7 @@
 import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
-import apolloClient from "./ApolloClient"
+import apolloClient from "./ApolloClient";
 
 Vue.config.productionTip = false;
 
@@ -18,7 +18,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
 const apolloProvider = new VueApollo({
-  defaultClient: apolloClient,
+  defaultClient: apolloClient
 });
 
 new Vue({
