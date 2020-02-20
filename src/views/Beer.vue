@@ -1,7 +1,19 @@
 <template>
   <div>
-    <div>{{ beer.name }}</div>
-    <div v-html="beer.description"></div>
+    <ApolloQuery
+      :query="require('../queries/beer.gql')"
+      :variables="{
+        slug: slug,
+      }"
+    >
+      <template slot-scope="{ result: { data, loading } }">
+        <div v-if="loading">Loading...</div>
+        <div v-else-if="data">
+          <div>{{ data.beer.name }}</div>
+          <div v-html="data.beer.description"></div>
+        </div>
+      </template>
+    </ApolloQuery>
   </div>
 </template>
 
@@ -14,13 +26,8 @@ import axios from "axios";
 })
 export default class Beer extends Vue {
   @Prop() private slug!: string;
-  public beer: any = {};
-
-  created() {
-    axios.get("http://localhost:5000/api/v1/beers/" + this.slug).then(data => {
-      this.beer = data.data;
-    });
-  }
+  
+  
 }
 </script>
 

@@ -1,0 +1,6 @@
+query beer($slug: String!){
+  beer(slug: $slug){
+    name,
+    description
+  }
+}
